@@ -9,6 +9,6 @@ export default registerAs('config', () => {
 			port: Number(process.env.POSTGRES_PORT),
 			host: process.env.POSTGRES_HOST,
 		},
-		port: Number(process.env.NEST_PORT),
+		nestPort: Number(process.env.NEST_PORT),
 	}
 })
