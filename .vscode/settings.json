@@ -1,0 +1,9 @@
+{
+	"conventionalCommits.scopes": [
+		"auth",
+		"global",
+		"roles",
+		"users",
+		"workspaces"
+	]
+}
