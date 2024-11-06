@@ -2,9 +2,13 @@
 import { Module } from '@nestjs/common'
 
 // Modules
+import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { DatabaseModule } from './database/database.module'
 import { HttpModule } from '@nestjs/axios'
+import { RolesModule } from './roles/roles.module'
+import { UsersModule } from './users/users.module'
+import { WorkspacesModule } from './workspaces/workspaces.module'
 
 // Controllers
 import { AppController } from './app.controller'
@@ -24,6 +28,10 @@ import configSchema from './config/configSchema'
 		}),
 		HttpModule,
 		DatabaseModule,
+		RolesModule,
+		UsersModule,
+		WorkspacesModule,
+		AuthModule,
 	],
 	controllers: [AppController],
 	providers: [],
