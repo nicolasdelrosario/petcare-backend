@@ -1,11 +1,11 @@
 {
-  "arrowParens": "avoid",
-  "bracketSameLine": false,
-  "bracketSpacing": true,
-  "endOfLine": "auto",
-  "semi": false,
-  "singleQuote": true,
-  "trailingComma": "all",
-  "useTabs": true,
-  "tabWidth": 2
+	"arrowParens": "avoid",
+	"bracketSameLine": false,
+	"bracketSpacing": true,
+	"endOfLine": "auto",
+	"semi": false,
+	"singleQuote": true,
+	"trailingComma": "all",
+	"useTabs": true,
+	"tabWidth": 2
 }

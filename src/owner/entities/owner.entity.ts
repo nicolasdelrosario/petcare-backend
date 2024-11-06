@@ -1,0 +1,56 @@
+// TypeORM
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	OneToMany,
+	CreateDateColumn,
+	UpdateDateColumn,
+} from 'typeorm'
+
+// Entities
+import { Pet } from 'src/pet/entities/pet.entity'
+
+@Entity()
+export class Owner {
+	@PrimaryGeneratedColumn()
+	id: number
+
+	@Column({ type: 'varchar', length: 255 })
+	name: string
+
+	@Column({ type: 'char', length: 8, unique: true, nullable: true })
+	dni: string
+
+	@Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+	email: string
+
+	@Column({ type: 'varchar', length: 15, unique: true, nullable: true })
+	phone: string
+
+	@Column({ type: 'varchar', length: 255, nullable: true })
+	address: string
+
+	@OneToMany(() => Pet, pet => pet.owner, { nullable: true })
+	pets: Pet[]
+
+	@CreateDateColumn({
+		type: 'timestamptz',
+		default: () => 'CURRENT_TIMESTAMP',
+	})
+	createdAt: Date
+
+	@UpdateDateColumn({
+		type: 'timestamptz',
+		default: () => 'CURRENT_TIMESTAMP',
+		onUpdate: 'CURRENT_TIMESTAMP',
+	})
+	updatedAt: Date
+
+	@Column({
+		type: 'timestamptz',
+		default: () => 'NULL',
+		nullable: true,
+	})
+	deletedAt: Date
+}
