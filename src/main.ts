@@ -10,7 +10,7 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 
 	const configService = app.get(ConfigService)
-	const port = configService.get('nestPort')
+	const port = configService.get<number>('config.nestPort')
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -22,8 +22,9 @@ async function bootstrap() {
 		}),
 	)
 
-	console.log(`Application is running on: http://localhost:${port}`)
+	await app.listen(port)
 	app.enableCors()
+	console.log(`Application is running on: http://localhost:${port}`)
 }
 
 bootstrap()
