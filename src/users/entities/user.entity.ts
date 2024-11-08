@@ -5,6 +5,7 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
+	OneToMany,
 	ManyToOne,
 	ManyToMany,
 	JoinTable,
@@ -13,6 +14,7 @@ import {
 // Entities
 import { Workspace } from 'src/workspaces/entities/workspace.entity'
 import { Role } from 'src/roles/entities/role.entity'
+import { Appointment } from 'src/appointments/entities/appointment.entity'
 
 @Entity()
 export class User {
@@ -40,6 +42,9 @@ export class User {
 	@ManyToMany(() => Role)
 	@JoinTable()
 	roles: Role[]
+
+	@OneToMany(() => Appointment, appointment => appointment.user)
+	appointments: Appointment[]
 
 	@CreateDateColumn({
 		type: 'timestamptz',
