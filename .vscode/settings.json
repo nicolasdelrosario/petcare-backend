@@ -4,6 +4,9 @@
 		"global",
 		"roles",
 		"users",
-		"workspaces"
+		"workspaces",
+		"pets",
+		"owners",
+		"appointments"
 	]
 }
