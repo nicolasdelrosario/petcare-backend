@@ -1,5 +1,12 @@
 // NestJS
-import { Controller, Get, Post, Body, Param } from '@nestjs/common'
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	Param,
+	ParseIntPipe,
+} from '@nestjs/common'
 
 // Services
 import { RolesService } from './roles.service'
@@ -7,6 +14,10 @@ import { RolesService } from './roles.service'
 // DTOs
 import { CreateRoleDto } from './dto/role.dto'
 
+// Api Documentation
+import { ApiTags } from '@nestjs/swagger'
+
+@ApiTags('Roles')
 @Controller('roles')
 export class RolesController {
 	constructor(private readonly roleService: RolesService) {}
@@ -19,7 +30,7 @@ export class RolesController {
 
 	// Endpoint para buscar un rol por su ID
 	@Get(':id')
-	async findById(@Param('id') id: number) {
+	async findById(@Param('id', ParseIntPipe) id: number) {
 		return this.roleService.findById(id)
 	}
 
