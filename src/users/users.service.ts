@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 
 // TypeORM
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In } from 'typeorm'
+import { Repository, In, IsNull } from 'typeorm'
 
 // Bcrypt
 import * as bcrypt from 'bcrypt'
@@ -28,17 +28,19 @@ export class UsersService {
 	) {}
 
 	async findAll(): Promise<User[]> {
-		return this.userRepository.find()
+		return this.userRepository.find({
+			where: { deletedAt: IsNull() },
+		})
 	}
 
 	async findById(id: number): Promise<User> {
 		const user = await this.userRepository.findOne({
-			where: { id },
+			where: { id, deletedAt: IsNull() },
 			relations: ['workspace', 'roles'],
 		})
-		if (!user) {
-			throw new NotFoundException(`User with id #${id} not found`)
-		}
+
+		if (!user) throw new NotFoundException(`User with id #${id} not found`)
+
 		return user
 	}
 
@@ -85,9 +87,9 @@ export class UsersService {
 		return this.findById(id)
 	}
 
-	async softDelete(id: number): Promise<void> {
+	async softDelete(id: number): Promise<User> {
 		const user = await this.findById(id)
 		user.deletedAt = new Date()
-		await this.userRepository.save(user)
+		return await this.userRepository.save(user)
 	}
 }
