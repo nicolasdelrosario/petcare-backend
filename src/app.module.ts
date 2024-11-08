@@ -2,10 +2,13 @@
 import { Module } from '@nestjs/common'
 
 // Modules
+import { AppointmentsModule } from './appointments/appointments.module'
 import { AuthModule } from './auth/auth.module'
 import { ConfigModule } from '@nestjs/config'
 import { DatabaseModule } from './database/database.module'
 import { HttpModule } from '@nestjs/axios'
+import { OwnersModule } from './owners/owners.module'
+import { PetsModule } from './pets/pets.module'
 import { RolesModule } from './roles/roles.module'
 import { UsersModule } from './users/users.module'
 import { WorkspacesModule } from './workspaces/workspaces.module'
@@ -26,12 +29,15 @@ import configSchema from './config/configSchema'
 			isGlobal: true,
 			validationSchema: configSchema,
 		}),
-		HttpModule,
+		AppointmentsModule,
+		AuthModule,
 		DatabaseModule,
+		HttpModule,
+		OwnersModule,
+		PetsModule,
 		RolesModule,
 		UsersModule,
 		WorkspacesModule,
-		AuthModule,
 	],
 	controllers: [AppController],
 	providers: [],
