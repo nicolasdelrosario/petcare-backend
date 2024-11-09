@@ -14,4 +14,11 @@ export class Workspace {
 
 	@OneToMany(() => User, user => user.workspace)
 	users: User[]
+
+	@Column({
+		type: 'timestamptz',
+		default: () => 'NULL',
+		nullable: true,
+	})
+	deletedAt: Date
 }
