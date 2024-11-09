@@ -44,7 +44,9 @@ export class WorkspacesService {
 		return this.findById(id)
 	}
 
-	async delete(id: number): Promise<void> {
-		await this.workspaceRepository.softDelete({ id })
+	async softDelete(id: number): Promise<Workspace> {
+		const workspace = await this.findById(id)
+		workspace.deletedAt = new Date()
+		return this.workspaceRepository.save(workspace)
 	}
 }
