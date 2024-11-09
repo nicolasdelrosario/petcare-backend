@@ -5,9 +5,9 @@ import {
 	Post,
 	Body,
 	Param,
-	Delete,
 	Put,
 	ParseIntPipe,
+	Patch,
 } from '@nestjs/common'
 
 // Services
@@ -55,8 +55,8 @@ export class WorkspacesController {
 	}
 
 	// Endpoint para eliminar un workspace
-	@Delete(':id')
-	async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
-		return this.workspacesService.delete(id)
+	@Patch(':id')
+	async delete(@Param('id', ParseIntPipe) id: number): Promise<Workspace> {
+		return this.workspacesService.softDelete(id)
 	}
 }
