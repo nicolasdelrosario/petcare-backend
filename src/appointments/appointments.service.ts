@@ -1,6 +1,9 @@
 // NestJS
 import { Injectable, NotFoundException } from '@nestjs/common'
 
+// Class-transformer
+import { instanceToPlain } from 'class-transformer'
+
 // TypeORM
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, IsNull } from 'typeorm'
@@ -25,11 +28,13 @@ export class AppointmentsService {
 		@InjectRepository(Pet) private readonly petRepository: Repository<Pet>,
 	) {}
 
-	async findAll(): Promise<Appointment[]> {
-		return await this.appointmentRepository.find({
+	async findAll(): Promise<Partial<Appointment>[]> {
+		const appointments = await this.appointmentRepository.find({
 			where: { deletedAt: IsNull() },
 			relations: ['user', 'pet', 'pet.owner'],
 		})
+
+		return appointments.map(appointment => instanceToPlain(appointment))
 	}
 
 	async findById(id: number): Promise<Appointment> {
