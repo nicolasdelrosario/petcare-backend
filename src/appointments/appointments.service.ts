@@ -28,6 +28,7 @@ export class AppointmentsService {
 	async findAll(): Promise<Appointment[]> {
 		return await this.appointmentRepository.find({
 			where: { deletedAt: IsNull() },
+			relations: ['user', 'pet', 'pet.owner'],
 		})
 	}
 
