@@ -5,6 +5,7 @@ import {
 	IsOptional,
 	IsString,
 	IsNotEmpty,
+	IsNumber,
 } from 'class-validator'
 
 // API Documentation
@@ -50,6 +51,7 @@ export class CreateAppointmentDto {
 		example: 1,
 	})
 	@IsNotEmpty()
+	@IsNumber()
 	petId: number
 
 	@ApiProperty({
@@ -57,6 +59,7 @@ export class CreateAppointmentDto {
 		example: 1,
 	})
 	@IsNotEmpty()
+	@IsNumber()
 	userId: number
 }
 
