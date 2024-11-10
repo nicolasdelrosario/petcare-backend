@@ -11,6 +11,9 @@ import {
 // Class-validator
 import { Matches } from 'class-validator'
 
+// Class-transformer
+import { Expose } from 'class-transformer'
+
 // Entities
 import { Pet } from 'src/pets/entities/pet.entity'
 import { User } from 'src/users/entities/user.entity'
@@ -61,6 +64,7 @@ export class Appointment {
 	})
 	deletedAt: Date
 
+	@Expose()
 	get dateTime(): Date | null {
 		if (!this.date || !this.time) return null
 		return new Date(`${this.date}T${this.time}`)
