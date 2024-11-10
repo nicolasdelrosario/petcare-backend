@@ -32,7 +32,7 @@ export class AppointmentsController {
 
 	// Endpoint para obtener todas las citas
 	@Get()
-	findAll(): Promise<Appointment[]> {
+	findAll(): Promise<Partial<Appointment>[]> {
 		return this.appointmentsService.findAll()
 	}
 
