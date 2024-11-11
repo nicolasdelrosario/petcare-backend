@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 
 // TypeORM
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, In, IsNull } from 'typeorm'
+import { Repository, IsNull } from 'typeorm'
 
 // Bcrypt
 import * as bcrypt from 'bcrypt'
@@ -11,7 +11,6 @@ import * as bcrypt from 'bcrypt'
 // Entities
 import { User } from './entities/user.entity'
 import { Workspace } from 'src/workspaces/entities/workspace.entity'
-import { Role } from 'src/roles/entities/role.entity'
 
 // DTOs
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto'
@@ -20,23 +19,28 @@ import { CreateUserDto, UpdateUserDto } from './dto/user.dto'
 export class UsersService {
 	constructor(
 		@InjectRepository(User)
-		private userRepository: Repository<User>,
+		private readonly userRepository: Repository<User>,
 		@InjectRepository(Workspace)
-		private workspaceRepository: Repository<Workspace>,
-		@InjectRepository(Role)
-		private roleRepository: Repository<Role>,
+		private readonly workspaceRepository: Repository<Workspace>,
 	) {}
+
+	async findOneByEmail(email: string): Promise<User> {
+		return this.userRepository.findOne({
+			where: { email, deletedAt: IsNull() },
+		})
+	}
 
 	async findAll(): Promise<User[]> {
 		return this.userRepository.find({
 			where: { deletedAt: IsNull() },
+			relations: ['workspace'],
 		})
 	}
 
 	async findById(id: number): Promise<User> {
 		const user = await this.userRepository.findOne({
 			where: { id, deletedAt: IsNull() },
-			relations: ['workspace', 'roles'],
+			relations: ['workspace'],
 		})
 
 		if (!user) throw new NotFoundException(`User with id #${id} not found`)
@@ -44,46 +48,30 @@ export class UsersService {
 		return user
 	}
 
-	async createUser(data: CreateUserDto): Promise<User> {
-		const user = this.userRepository.create(data)
+	async createUser(createUserDto: CreateUserDto): Promise<User> {
+		const user = this.userRepository.create(createUserDto)
 
-		const saltRounds = 10
-		user.password = await bcrypt.hash(data.password, saltRounds)
-
-		if (data.workspaceId) {
+		if (createUserDto.workspaceId) {
 			const workspace = await this.workspaceRepository.findOne({
-				where: { id: data.workspaceId },
+				where: { id: createUserDto.workspaceId },
 			})
 
 			if (!workspace)
 				throw new NotFoundException(
-					`Workspace with id #${data.workspaceId} not found`,
+					`Workspace with id #${createUserDto.workspaceId} not found`,
 				)
 
 			user.workspace = workspace
 		}
 
-		if (data.rolesIds) {
-			const roles = await this.roleRepository.find({
-				where: { id: In(data.rolesIds) },
-			})
-
-			if (roles.length !== data.rolesIds.length)
-				throw new NotFoundException(`Roles with ids ${data.rolesIds} not found`)
-
-			user.roles = roles
-		}
-
-		return this.userRepository.save(user)
+		return this.userRepository.save(createUserDto)
 	}
 
-	async updateUser(id: number, changes: UpdateUserDto): Promise<User> {
-		if (changes.password) {
-			const saltRounds = 10
-			changes.password = await bcrypt.hash(changes.password, saltRounds)
-		}
+	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+		if (updateUserDto.password)
+			updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
 
-		await this.userRepository.update({ id }, { ...changes })
+		await this.userRepository.update({ id }, { ...updateUserDto })
 		return this.findById(id)
 	}
 
