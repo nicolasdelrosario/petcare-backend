@@ -9,7 +9,6 @@ import { DatabaseModule } from './database/database.module'
 import { HttpModule } from '@nestjs/axios'
 import { OwnersModule } from './owners/owners.module'
 import { PetsModule } from './pets/pets.module'
-import { RolesModule } from './roles/roles.module'
 import { UsersModule } from './users/users.module'
 import { WorkspacesModule } from './workspaces/workspaces.module'
 
@@ -35,7 +34,6 @@ import configSchema from './config/configSchema'
 		HttpModule,
 		OwnersModule,
 		PetsModule,
-		RolesModule,
 		UsersModule,
 		WorkspacesModule,
 	],
