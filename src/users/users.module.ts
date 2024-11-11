@@ -13,10 +13,9 @@ import { UsersService } from './users.service'
 // Entities
 import { User } from './entities/user.entity'
 import { Workspace } from 'src/workspaces/entities/workspace.entity'
-import { Role } from 'src/roles/entities/role.entity'
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User, Workspace, Role])],
+	imports: [TypeOrmModule.forFeature([User, Workspace])],
 	providers: [UsersService],
 	controllers: [UsersController],
 	exports: [UsersService, TypeOrmModule],
