@@ -7,13 +7,14 @@ import {
 	UpdateDateColumn,
 	OneToMany,
 	ManyToOne,
-	ManyToMany,
-	JoinTable,
+	// ManyToMany,
+	// JoinTable,
+	DeleteDateColumn,
 } from 'typeorm'
 
 // Entities
 import { Workspace } from 'src/workspaces/entities/workspace.entity'
-import { Role } from 'src/roles/entities/role.entity'
+// import { Role } from 'src/roles/entities/role.entity'
 import { Appointment } from 'src/appointments/entities/appointment.entity'
 
 @Entity()
@@ -21,7 +22,7 @@ export class User {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@Column({ unique: true })
+	@Column({ unique: true, nullable: false })
 	email: string
 
 	@Column()
@@ -39,9 +40,8 @@ export class User {
 	@ManyToOne(() => Workspace, workspace => workspace.users)
 	workspace: Workspace
 
-	@ManyToMany(() => Role)
-	@JoinTable()
-	roles: Role[]
+	@Column({ default: 'user' })
+	role: string
 
 	@OneToMany(() => Appointment, appointment => appointment.user)
 	appointments: Appointment[]
@@ -59,10 +59,6 @@ export class User {
 	})
 	updatedAt: Date
 
-	@Column({
-		type: 'timestamptz',
-		default: () => 'NULL',
-		nullable: true,
-	})
+	@DeleteDateColumn()
 	deletedAt: Date
 }
