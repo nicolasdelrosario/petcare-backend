@@ -29,13 +29,13 @@ export class PetsController {
 
 	// Endpoint para obtener todas las mascotas
 	@Get()
-	findAll(): Promise<Pet[]> {
+	findAll(): Promise<Partial<Pet>[]> {
 		return this.petsService.findAll()
 	}
 
 	// Endpoint para obtener una mascota por su ID
 	@Get(':id')
-	findById(@Param('id', ParseIntPipe) id: number): Promise<Pet> {
+	findById(@Param('id', ParseIntPipe) id: number): Promise<Partial<Pet>> {
 		return this.petsService.findById(id)
 	}
 
@@ -50,7 +50,7 @@ export class PetsController {
 	update(
 		@Param('id', ParseIntPipe) id: number,
 		@Body() changes: UpdatePetDto,
-	): Promise<Pet> {
+	): Promise<Partial<Pet>> {
 		return this.petsService.updatePet(id, changes)
 	}
 
