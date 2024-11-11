@@ -9,8 +9,10 @@ import {
 	IsNumber,
 	IsPositive,
 	MinLength,
-	IsArray,
 } from 'class-validator'
+
+// Class-transformer
+import { Transform } from 'class-transformer'
 
 // API Documentation
 import { ApiProperty, PartialType } from '@nestjs/swagger'
@@ -26,11 +28,13 @@ export class CreateUserDto {
 	@IsNotEmpty()
 	@IsString()
 	@MinLength(8)
+	@Transform(({ value }) => value.trim())
 	password: string
 
 	@ApiProperty({ description: 'Nombre del usuario' })
 	@IsOptional()
 	@IsString()
+	@Transform(({ value }) => value.trim())
 	name: string
 
 	@ApiProperty({ description: 'DNI del usuario' })
@@ -43,11 +47,6 @@ export class CreateUserDto {
 	@IsPhoneNumber('PE')
 	@Matches(/^(9|8|7|3)[0-9]{8}$/)
 	phone: string
-
-	@ApiProperty({ description: 'ID del rol del usuario', type: [Number] })
-	@IsNotEmpty()
-	@IsArray()
-	rolesIds: number[]
 
 	@ApiProperty({ description: 'ID del Workspace del usuario' })
 	@IsNotEmpty()
