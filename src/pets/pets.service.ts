@@ -24,13 +24,15 @@ export class PetsService {
 		private readonly ownerRepository: Repository<Owner>,
 	) {}
 
-	async findAll(): Promise<Pet[]> {
-		return await this.petRepository.find({
+	async findAll(): Promise<Partial<Pet>[]> {
+		const pets = await this.petRepository.find({
 			where: { deletedAt: IsNull() },
 		})
+
+		return pets.map(pet => instanceToPlain(pet))
 	}
 
-	async findById(id: number): Promise<any> {
+	async findById(id: number): Promise<Partial<Pet>> {
 		const pet = await this.petRepository.findOne({
 			where: { id, deletedAt: IsNull() },
 			relations: ['owner'],
@@ -56,7 +58,7 @@ export class PetsService {
 		return await this.petRepository.save(pet)
 	}
 
-	async updatePet(id: number, changes: UpdatePetDto): Promise<Pet> {
+	async updatePet(id: number, changes: UpdatePetDto): Promise<Partial<Pet>> {
 		await this.petRepository.update({ id }, { ...changes })
 		return this.findById(id)
 	}
