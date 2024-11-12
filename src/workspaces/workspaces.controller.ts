@@ -25,11 +25,11 @@ import { CreateWorkspaceDto } from './dto/workspace.dto'
 // Entities
 import { Workspace } from './entities/workspace.entity'
 
-// Api Documentation
-import { ApiTags } from '@nestjs/swagger'
+// Decorators
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
 
-@ApiTags('Workspaces')
-@Auth(Role.ADMIN)
+@ApiTagsAndBearer('Workspaces')
+@Auth(Role.USER)
 @Controller('workspaces')
 export class WorkspacesController {
 	constructor(private readonly workspacesService: WorkspacesService) {}
