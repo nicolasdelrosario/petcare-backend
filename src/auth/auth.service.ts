@@ -1,49 +1,59 @@
 // NestJS
-import { Injectable, UnauthorizedException } from '@nestjs/common'
-
-// TypeORM
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException,
+} from '@nestjs/common'
 
 // Jwt
 import { JwtService } from '@nestjs/jwt'
 
-// BCrypt
-import * as bcrypt from 'bcrypt'
+// Bcryptjs
+import * as bcryptjs from 'bcryptjs'
 
-// Entities
-import { User } from 'src/users/entities/user.entity'
+// Services
+import { UsersService } from 'src/users/users.service'
+
+// DTOs
+import { CreateUserDto } from 'src/users/dto/user.dto'
+import { LoginDto } from './dto/login.dto'
 
 @Injectable()
 export class AuthService {
 	constructor(
-		@InjectRepository(User)
-		private userRepository: Repository<User>,
+		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 	) {}
 
-	async validateUser(
-		email: string,
-		password: string,
-	): Promise<Omit<User, 'password'> | null> {
-		const user = await this.userRepository.findOne({
-			where: { email },
-			relations: ['roles'],
+	async register({ email, password, ...data }: CreateUserDto) {
+		const user = await this.usersService.findOneByEmail(email)
+
+		if (user) throw new BadRequestException('User already exists')
+
+		return await this.usersService.createUser({
+			email,
+			password: await bcryptjs.hash(password, 10),
+			...data,
 		})
-
-		if (user && (await bcrypt.compare(password, user.password))) {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { password, ...result } = user
-			return result
-		}
-
-		throw new UnauthorizedException('Invalid credentials')
 	}
 
-	async login(user: Omit<User, 'password'>) {
-		const payload = { username: user.email, sub: user.id, roles: user.roles }
+	async login({ email, password }: LoginDto) {
+		const user = await this.usersService.findByEmailWithPassword(email)
+
+		if (!user) throw new UnauthorizedException('Email or password is wrong')
+
+		const isPasswordValid = await bcryptjs.compare(password, user.password)
+
+		if (!isPasswordValid)
+			throw new UnauthorizedException('Email or password is wrong')
+
+		const payload = { email: user.email, role: user.role }
+
+		const token = await this.jwtService.signAsync(payload)
+
 		return {
-			access_token: this.jwtService.sign(payload),
+			token,
+			email,
 		}
 	}
 }
