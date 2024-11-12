@@ -31,10 +31,10 @@ import { CreatePetDto, UpdatePetDto } from './dto/pet.dto'
 // Roles
 import { Role } from 'src/common/enums/role.enum'
 
-// Api Documentation
-import { ApiTags } from '@nestjs/swagger'
+// Decorators
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
 
-@ApiTags('Pets')
+@ApiTagsAndBearer('Pets')
 @Auth(Role.USER)
 @Controller('pets')
 export class PetsController {
