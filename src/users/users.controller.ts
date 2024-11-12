@@ -28,7 +28,7 @@ import { Role } from 'src/common/enums/role.enum'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Users')
-@Auth(Role.USER)
+@Auth(Role.ADMIN)
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
