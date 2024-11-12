@@ -10,19 +10,32 @@ import {
 	ParseIntPipe,
 } from '@nestjs/common'
 
+//Auth
+import { Auth } from 'src/auth/decorators/auth.decorator'
+
 // Services
 import { PetsService } from './pets.service'
 
 // Entities
 import { Pet } from './entities/pet.entity'
 
+// // Decorators
+// import { ActiveUser } from 'src/common/decorators/active-user-decorator'
+
+// // Interfaces
+// import { UserActiveI } from 'src/common/interfaces/user-active-interface'
+
 // DTOs
 import { CreatePetDto, UpdatePetDto } from './dto/pet.dto'
+
+// Roles
+import { Role } from 'src/common/enums/role.enum'
 
 // Api Documentation
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Pets')
+@Auth(Role.USER)
 @Controller('pets')
 export class PetsController {
 	constructor(private readonly petsService: PetsService) {}
