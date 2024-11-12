@@ -9,6 +9,9 @@ import {
 	ParseIntPipe,
 } from '@nestjs/common'
 
+//Auth
+import { Auth } from 'src/auth/decorators/auth.decorator'
+
 // Services
 import { UsersService } from './users.service'
 
@@ -18,10 +21,14 @@ import { User } from './entities/user.entity'
 // DTOs
 import { UpdateUserDto } from './dto/user.dto'
 
+// Roles
+import { Role } from 'src/common/enums/role.enum'
+
 // Api Documentation
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Users')
+@Auth(Role.USER)
 @Controller('users')
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
@@ -47,9 +54,9 @@ export class UsersController {
 		return this.usersService.updateUser(id, changes)
 	}
 
-	// Endpoint para eliminar un usuario (soft delete)
+	// Endpoint para eliminar un usuario (softRemove)
 	@Patch(':id')
-	async delete(@Param('id', ParseIntPipe) id: number): Promise<User> {
-		return this.usersService.softDelete(id)
+	async remove(@Param('id', ParseIntPipe) id: number): Promise<User> {
+		return this.usersService.remove(id)
 	}
 }
