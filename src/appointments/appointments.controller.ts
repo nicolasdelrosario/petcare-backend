@@ -10,6 +10,12 @@ import {
 	ParseIntPipe,
 } from '@nestjs/common'
 
+//Auth
+import { Auth } from 'src/auth/decorators/auth.decorator'
+
+// Roles
+import { Role } from 'src/common/enums/role.enum'
+
 // Services
 import { AppointmentsService } from './appointments.service'
 
@@ -26,6 +32,7 @@ import {
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Appointments')
+@Auth(Role.USER)
 @Controller('appointments')
 export class AppointmentsController {
 	constructor(private readonly appointmentsService: AppointmentsService) {}
