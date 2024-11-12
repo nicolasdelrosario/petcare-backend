@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, IsNull } from 'typeorm'
 
 // Bcrypt
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcryptjs'
 
 // Entities
 import { User } from './entities/user.entity'
@@ -24,10 +24,20 @@ export class UsersService {
 		private readonly workspaceRepository: Repository<Workspace>,
 	) {}
 
-	async findOneByEmail(email: string): Promise<User> {
-		return this.userRepository.findOne({
+	findOneByEmail(email: string) {
+		return this.userRepository.findOneBy({ email })
+	}
+
+	async findByEmailWithPassword(email: string): Promise<User> {
+		const user = await this.userRepository.findOne({
 			where: { email, deletedAt: IsNull() },
+			select: ['id', 'name', 'email', 'password', 'role'],
+			relations: ['workspace'],
 		})
+
+		if (!user) throw new NotFoundException(`User with email ${email} not found`)
+
+		return user
 	}
 
 	async findAll(): Promise<User[]> {
@@ -64,7 +74,7 @@ export class UsersService {
 			user.workspace = workspace
 		}
 
-		return this.userRepository.save(createUserDto)
+		return this.userRepository.save(user)
 	}
 
 	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
@@ -75,9 +85,7 @@ export class UsersService {
 		return this.findById(id)
 	}
 
-	async softDelete(id: number): Promise<User> {
-		const user = await this.findById(id)
-		user.deletedAt = new Date()
-		return await this.userRepository.save(user)
+	async remove(id: number) {
+		return await this.userRepository.softRemove({ id })
 	}
 }
