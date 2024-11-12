@@ -7,15 +7,15 @@ import {
 	UpdateDateColumn,
 	OneToMany,
 	ManyToOne,
-	// ManyToMany,
-	// JoinTable,
 	DeleteDateColumn,
 } from 'typeorm'
 
 // Entities
 import { Workspace } from 'src/workspaces/entities/workspace.entity'
-// import { Role } from 'src/roles/entities/role.entity'
 import { Appointment } from 'src/appointments/entities/appointment.entity'
+
+// Enums
+import { Role } from '../../common/enums/role.enum'
 
 @Entity()
 export class User {
@@ -25,7 +25,7 @@ export class User {
 	@Column({ unique: true, nullable: false })
 	email: string
 
-	@Column()
+	@Column({ nullable: false, select: false })
 	password: string
 
 	@Column({ nullable: true })
@@ -40,7 +40,7 @@ export class User {
 	@ManyToOne(() => Workspace, workspace => workspace.users)
 	workspace: Workspace
 
-	@Column({ default: 'user' })
+	@Column({ type: 'enum', default: Role.USER, enum: Role })
 	role: string
 
 	@OneToMany(() => Appointment, appointment => appointment.user)
