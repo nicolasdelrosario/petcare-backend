@@ -25,10 +25,10 @@ import { Owner } from './entities/owner.entity'
 // DTOs
 import { CreateOwnerDto, UpdateOwnerDto } from './dto/owner.dto'
 
-// Api Documentation
-import { ApiTags } from '@nestjs/swagger'
+// Decorators
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
 
-@ApiTags('Owners')
+@ApiTagsAndBearer('Owners')
 @Auth(Role.USER)
 @Controller('owners')
 export class OwnersController {
