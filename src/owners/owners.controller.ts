@@ -10,6 +10,12 @@ import {
 	ParseIntPipe,
 } from '@nestjs/common'
 
+//Auth
+import { Auth } from 'src/auth/decorators/auth.decorator'
+
+// Roles
+import { Role } from 'src/common/enums/role.enum'
+
 // Services
 import { OwnersService } from './owners.service'
 
@@ -23,6 +29,7 @@ import { CreateOwnerDto, UpdateOwnerDto } from './dto/owner.dto'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Owners')
+@Auth(Role.USER)
 @Controller('owners')
 export class OwnersController {
 	constructor(private readonly ownersService: OwnersService) {}
