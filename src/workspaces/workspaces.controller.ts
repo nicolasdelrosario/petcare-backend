@@ -10,6 +10,12 @@ import {
 	Patch,
 } from '@nestjs/common'
 
+//Auth
+import { Auth } from 'src/auth/decorators/auth.decorator'
+
+// Roles
+import { Role } from 'src/common/enums/role.enum'
+
 // Services
 import { WorkspacesService } from './workspaces.service'
 
@@ -23,6 +29,7 @@ import { Workspace } from './entities/workspace.entity'
 import { ApiTags } from '@nestjs/swagger'
 
 @ApiTags('Workspaces')
+@Auth(Role.ADMIN)
 @Controller('workspaces')
 export class WorkspacesController {
 	constructor(private readonly workspacesService: WorkspacesService) {}
