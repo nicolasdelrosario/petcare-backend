@@ -28,10 +28,10 @@ import {
 	UpdateAppointmentDto,
 } from './dto/appointment.dto'
 
-// Api Documentation
-import { ApiTags } from '@nestjs/swagger'
+// Decorators
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
 
-@ApiTags('Appointments')
+@ApiTagsAndBearer('Appointments')
 @Auth(Role.USER)
 @Controller('appointments')
 export class AppointmentsController {
