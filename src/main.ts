@@ -27,6 +27,8 @@ async function bootstrap() {
 		}),
 	)
 
+	app.enableCors()
+
 	const config = new DocumentBuilder()
 		.setTitle('Petcare API')
 		.setDescription('The Petcare API description')
@@ -38,7 +40,6 @@ async function bootstrap() {
 	SwaggerModule.setup('docs', app, document)
 
 	await app.listen(port)
-	app.enableCors()
 	console.log(`Application is running on: http://localhost:${port}`)
 }
 
