@@ -10,11 +10,8 @@ import {
 	Patch,
 } from '@nestjs/common'
 
-//Auth
-import { Auth } from 'src/auth/decorators/auth.decorator'
-
 // Roles
-import { Role } from 'src/common/enums/role.enum'
+// import { Role } from 'src/common/enums/role.enum'
 
 // Services
 import { WorkspacesService } from './workspaces.service'
@@ -26,10 +23,11 @@ import { CreateWorkspaceDto } from './dto/workspace.dto'
 import { Workspace } from './entities/workspace.entity'
 
 // Decorators
-import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
+// import { Auth } from 'src/auth/decorators/auth.decorator'
+// import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
 
-@ApiTagsAndBearer('Workspaces')
-@Auth(Role.USER)
+// @ApiTagsAndBearer('Workspaces')
+// @Auth(Role.USER)
 @Controller('workspaces')
 export class WorkspacesController {
 	constructor(private readonly workspacesService: WorkspacesService) {}
