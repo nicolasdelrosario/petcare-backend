@@ -52,6 +52,10 @@ export class PetsService {
 			const owner = await this.ownerRepository.findOne({
 				where: { id: data.ownerId },
 			})
+
+			if (!owner)
+				throw new NotFoundException(`Owner with id #${data.ownerId} not found`)
+
 			pet.owner = owner
 		}
 
