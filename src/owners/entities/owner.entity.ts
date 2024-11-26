@@ -19,7 +19,7 @@ export class Owner {
 	@Column({ type: 'varchar', length: 50 })
 	name: string
 
-	@Column({ type: 'char', length: 8, unique: true, nullable: true })
+	@Column({ type: 'varchar', length: 10, unique: true, nullable: true })
 	dni: string
 
 	@Column({ type: 'varchar', length: 70, unique: true, nullable: true })

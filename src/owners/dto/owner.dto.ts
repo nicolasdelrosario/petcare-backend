@@ -21,7 +21,6 @@ export class CreateOwnerDto {
 	@ApiProperty({ description: 'DNI' })
 	@IsNumberString()
 	@IsOptional()
-	@IsString()
 	dni: string
 
 	@ApiProperty({ description: 'Correo' })
