@@ -35,7 +35,7 @@ export class PetsService {
 	async findById(id: number): Promise<Partial<Pet>> {
 		const pet = await this.petRepository.findOne({
 			where: { id, deletedAt: IsNull() },
-			relations: ['owner'],
+			relations: ['owner', 'appointments'],
 		})
 
 		if (!pet) throw new NotFoundException(`Pet with id #${id} not found`)
