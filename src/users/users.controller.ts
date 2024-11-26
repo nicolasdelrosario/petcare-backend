@@ -39,6 +39,12 @@ export class UsersController {
 		return this.usersService.findAll()
 	}
 
+	// Endpoint para obtener un usuario por su email
+	@Get('email/:email')
+	async findOneByEmail(@Param('email') email: string): Promise<User> {
+		return this.usersService.findOneByEmail(email)
+	}
+
 	// Endpoint para obtener un usuario por su ID
 	@Get(':id')
 	async findById(@Param('id', ParseIntPipe) id: number): Promise<User> {
