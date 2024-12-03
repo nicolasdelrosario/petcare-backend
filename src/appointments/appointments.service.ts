@@ -6,7 +6,7 @@ import { instanceToPlain } from 'class-transformer'
 
 // TypeORM
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, IsNull } from 'typeorm'
+import { Repository } from 'typeorm'
 
 // Entities
 import { Appointment } from './entities/appointment.entity'
@@ -19,6 +19,9 @@ import {
 	UpdateAppointmentDto,
 } from './dto/appointment.dto'
 
+// Interfaces
+import { UserActiveI } from 'src/common/interfaces/user-active-interface'
+
 @Injectable()
 export class AppointmentsService {
 	constructor(
@@ -28,18 +31,73 @@ export class AppointmentsService {
 		@InjectRepository(Pet) private readonly petRepository: Repository<Pet>,
 	) {}
 
-	async findAll(): Promise<Partial<Appointment>[]> {
+	async findAll(user: UserActiveI) {
 		const appointments = await this.appointmentRepository.find({
-			where: { deletedAt: IsNull() },
+			where: { workspaceId: user.workspaceId },
 			relations: ['user', 'pet', 'pet.owner'],
 		})
 
 		return appointments.map(appointment => instanceToPlain(appointment))
 	}
 
-	async findById(id: number): Promise<Appointment> {
+	async findOneById(id: number, user: UserActiveI) {
+		return this.findAppointmentById(id, user.workspaceId)
+	}
+
+	async createAppointment(
+		createAppointmentDto: CreateAppointmentDto,
+		user: UserActiveI,
+	) {
+		const appointment = this.appointmentRepository.create(createAppointmentDto)
+
+		if (createAppointmentDto.userId)
+			appointment.user = await this.findUserById(
+				createAppointmentDto.userId,
+				user.workspaceId,
+			)
+
+		if (createAppointmentDto.petId)
+			appointment.pet = await this.findPetById(
+				createAppointmentDto.petId,
+				user.workspaceId,
+			)
+
+		return this.appointmentRepository.save(appointment)
+	}
+
+	async updateAppointment(
+		id: number,
+		updateAppointmentDto: UpdateAppointmentDto,
+		user: UserActiveI,
+	) {
+		const appointment = await this.findAppointmentById(id, user.workspaceId)
+
+		if (updateAppointmentDto.userId)
+			appointment.user = await this.findUserById(
+				updateAppointmentDto.userId,
+				user.workspaceId,
+			)
+
+		if (updateAppointmentDto.petId)
+			appointment.pet = await this.findPetById(
+				updateAppointmentDto.petId,
+				user.workspaceId,
+			)
+
+		return await this.appointmentRepository.update(id, {
+			...updateAppointmentDto,
+			workspaceId: user.workspaceId,
+		})
+	}
+
+	async softDelete(id: number, user: UserActiveI) {
+		await this.findAppointmentById(id, user.workspaceId)
+		await this.appointmentRepository.softRemove({ id })
+	}
+
+	private async findAppointmentById(id, workspaceId: number) {
 		const appointment = await this.appointmentRepository.findOne({
-			where: { id, deletedAt: IsNull() },
+			where: { id, workspaceId },
 			relations: ['user', 'pet', 'pet.owner'],
 		})
 
@@ -49,37 +107,26 @@ export class AppointmentsService {
 		return appointment
 	}
 
-	async createAppointment(data: CreateAppointmentDto): Promise<Appointment> {
-		const appointment = this.appointmentRepository.create(data)
+	private async findUserById(id: number, workspaceId: number) {
+		const user = await this.userRepository.findOne({
+			where: { id, workspace: { id: workspaceId } },
+		})
 
-		if (data.userId) {
-			const user = await this.userRepository.findOne({
-				where: { id: data.userId },
-			})
-			appointment.user = user
-		}
+		if (!user) throw new NotFoundException(`User with id #${id} not found`)
 
-		if (data.petId) {
-			const pet = await this.petRepository.findOne({
-				where: { id: data.petId },
-			})
-			appointment.pet = pet
-		}
-
-		return await this.appointmentRepository.save(appointment)
+		return user
 	}
 
-	async updateAppointment(
-		id: number,
-		changes: UpdateAppointmentDto,
-	): Promise<Appointment> {
-		await this.appointmentRepository.update({ id }, { ...changes })
-		return this.findById(id)
-	}
+	private async findPetById(id: number, workspaceId: number) {
+		const pet = await this.petRepository.findOne({
+			where: { id, workspaceId },
+			relations: ['owner'],
+		})
 
-	async softDelete(id: number): Promise<Appointment> {
-		const appointment = await this.findById(id)
-		appointment.deletedAt = new Date()
-		return await this.appointmentRepository.save(appointment)
+		if (!pet) {
+			throw new NotFoundException(`Pet with id #${id} not found`)
+		}
+
+		return pet
 	}
 }
