@@ -52,14 +52,11 @@ export class AuthService {
 		const { email, password } = loginDto
 
 		const user = await this.usersService.findByEmailWithPassword(email)
-		if (!user) {
-			throw new UnauthorizedException('Email or password is wrong')
-		}
+		if (!user) throw new UnauthorizedException('Email or password is wrong')
 
-		const isPasswordValid = await bcryptjs.compare(password, user.password)
-		if (!isPasswordValid) {
+		const isPasswordValid = await bcryptjs.compareSync(password, user.password)
+		if (!isPasswordValid)
 			throw new UnauthorizedException('Email or password is wrong')
-		}
 
 		const token = await this.generateToken(user)
 
