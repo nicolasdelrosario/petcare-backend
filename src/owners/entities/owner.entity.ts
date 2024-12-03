@@ -1,15 +1,19 @@
 // TypeORM
 import {
-	Entity,
-	PrimaryGeneratedColumn,
 	Column,
-	OneToMany,
 	CreateDateColumn,
+	DeleteDateColumn,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
 
 // Entities
 import { Pet } from 'src/pets/entities/pet.entity'
+import { Workspace } from 'src/workspaces/entities/workspace.entity'
 
 @Entity()
 export class Owner {
@@ -19,13 +23,13 @@ export class Owner {
 	@Column({ type: 'varchar', length: 50 })
 	name: string
 
-	@Column({ type: 'varchar', length: 10, unique: true, nullable: true })
+	@Column({ type: 'varchar', length: 10, nullable: true })
 	dni: string
 
-	@Column({ type: 'varchar', length: 70, unique: true, nullable: true })
+	@Column({ type: 'varchar', length: 70, nullable: true })
 	email: string
 
-	@Column({ type: 'varchar', length: 20, unique: true, nullable: true })
+	@Column({ type: 'varchar', length: 20, nullable: true })
 	phone: string
 
 	@Column({ type: 'varchar', length: 100, nullable: true })
@@ -33,6 +37,13 @@ export class Owner {
 
 	@OneToMany(() => Pet, pet => pet.owner, { nullable: true })
 	pets: Pet[]
+
+	@ManyToOne(() => Workspace)
+	@JoinColumn({ name: 'workspaceId', referencedColumnName: 'id' })
+	workspace: Workspace
+
+	@Column()
+	workspaceId: number
 
 	@CreateDateColumn({
 		type: 'timestamptz',
@@ -47,10 +58,6 @@ export class Owner {
 	})
 	updatedAt: Date
 
-	@Column({
-		type: 'timestamptz',
-		default: () => 'NULL',
-		nullable: true,
-	})
+	@DeleteDateColumn()
 	deletedAt: Date
 }
