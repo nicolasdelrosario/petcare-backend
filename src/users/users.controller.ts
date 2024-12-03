@@ -15,8 +15,11 @@ import { Auth } from 'src/auth/decorators/auth.decorator'
 // Services
 import { UsersService } from './users.service'
 
-// Entities
-import { User } from './entities/user.entity'
+// Decorators
+import { ActiveUser } from 'src/common/decorators/active-user-decorator'
+
+// Interfaces
+import { UserActiveI } from 'src/common/interfaces/user-active-interface'
 
 // DTOs
 import { UpdateUserDto } from './dto/user.dto'
@@ -35,34 +38,35 @@ export class UsersController {
 
 	// Endpoint para listar todos los usuarios
 	@Get()
-	async findAll(): Promise<User[]> {
-		return this.usersService.findAll()
-	}
-
-	// Endpoint para obtener un usuario por su email
-	@Get('email/:email')
-	async findOneByEmail(@Param('email') email: string): Promise<User> {
-		return this.usersService.findOneByEmail(email)
+	async findAll(@ActiveUser() user: UserActiveI) {
+		return this.usersService.findAll(user)
 	}
 
 	// Endpoint para obtener un usuario por su ID
 	@Get(':id')
-	async findById(@Param('id', ParseIntPipe) id: number): Promise<User> {
-		return this.usersService.findById(id)
+	async findOneById(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.usersService.findOneById(id, user)
 	}
 
 	// Endpoint para actualizar un usuario
 	@Put(':id')
 	async update(
 		@Param('id', ParseIntPipe) id: number,
-		@Body() changes: UpdateUserDto,
-	): Promise<User> {
-		return this.usersService.updateUser(id, changes)
+		@Body() updateUserDto: UpdateUserDto,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.usersService.updateUser(id, updateUserDto, user)
 	}
 
 	// Endpoint para eliminar un usuario
 	@Delete(':id')
-	async remove(@Param('id', ParseIntPipe) id: number): Promise<User> {
-		return this.usersService.remove(id)
+	async remove(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.usersService.remove(id, user)
 	}
 }
