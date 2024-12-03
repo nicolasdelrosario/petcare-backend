@@ -1,10 +1,12 @@
 // TypeORM
 import {
-	Entity,
-	PrimaryGeneratedColumn,
 	Column,
-	ManyToOne,
 	CreateDateColumn,
+	DeleteDateColumn,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
 
@@ -17,6 +19,7 @@ import { Expose } from 'class-transformer'
 // Entities
 import { Pet } from 'src/pets/entities/pet.entity'
 import { User } from 'src/users/entities/user.entity'
+import { Workspace } from 'src/workspaces/entities/workspace.entity'
 
 @Entity()
 export class Appointment {
@@ -44,6 +47,13 @@ export class Appointment {
 	@ManyToOne(() => User, user => user.appointments)
 	user: User
 
+	@ManyToOne(() => Workspace)
+	@JoinColumn({ name: 'workspaceId', referencedColumnName: 'id' })
+	workspace: Workspace
+
+	@Column()
+	workspaceId: number
+
 	@CreateDateColumn({
 		type: 'timestamptz',
 		default: () => 'CURRENT_TIMESTAMP',
@@ -57,11 +67,7 @@ export class Appointment {
 	})
 	updatedAt: Date
 
-	@Column({
-		type: 'timestamptz',
-		default: () => 'NULL',
-		nullable: true,
-	})
+	@DeleteDateColumn()
 	deletedAt: Date
 
 	@Expose()
