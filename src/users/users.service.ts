@@ -7,7 +7,7 @@ import {
 
 // TypeORM
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, IsNull } from 'typeorm'
+import { Repository } from 'typeorm'
 
 // Bcrypt
 import * as bcrypt from 'bcryptjs'
@@ -37,7 +37,7 @@ export class UsersService {
 
 	async findByEmailWithPassword(email: string): Promise<User> {
 		const user = await this.userRepository.findOne({
-			where: { email, deletedAt: IsNull() },
+			where: { email },
 			select: ['id', 'name', 'email', 'password', 'role'],
 			relations: ['workspace'],
 		})
@@ -61,7 +61,6 @@ export class UsersService {
 	async createUser(createUserDto: CreateUserDto, user?: UserActiveI) {
 		const newUser = this.userRepository.create({
 			...createUserDto,
-			password: await bcrypt.hash(createUserDto.password, 10),
 		})
 
 		const workspaceId = createUserDto.workspaceId || user?.workspaceId
@@ -95,7 +94,7 @@ export class UsersService {
 
 	private async findUserById(id: number, workspaceId: number) {
 		const user = await this.userRepository.findOne({
-			where: { id, workspace: { id: workspaceId }, deletedAt: IsNull() },
+			where: { id, workspace: { id: workspaceId } },
 			relations: ['workspace'],
 		})
 
