@@ -3,11 +3,11 @@ import {
 	Controller,
 	Get,
 	Post,
-	Patch,
 	Body,
 	Param,
 	Put,
 	ParseIntPipe,
+	Delete,
 } from '@nestjs/common'
 
 //Auth
@@ -16,14 +16,11 @@ import { Auth } from 'src/auth/decorators/auth.decorator'
 // Services
 import { PetsService } from './pets.service'
 
-// Entities
-import { Pet } from './entities/pet.entity'
+// Decorators
+import { ActiveUser } from 'src/common/decorators/active-user-decorator'
 
-// // Decorators
-// import { ActiveUser } from 'src/common/decorators/active-user-decorator'
-
-// // Interfaces
-// import { UserActiveI } from 'src/common/interfaces/user-active-interface'
+// Interfaces
+import { UserActiveI } from 'src/common/interfaces/user-active-interface'
 
 // DTOs
 import { CreatePetDto, UpdatePetDto } from './dto/pet.dto'
@@ -42,34 +39,41 @@ export class PetsController {
 
 	// Endpoint para obtener todas las mascotas
 	@Get()
-	findAll(): Promise<Partial<Pet>[]> {
-		return this.petsService.findAll()
+	findAll(@ActiveUser() user: UserActiveI) {
+		return this.petsService.findAll(user)
 	}
 
 	// Endpoint para obtener una mascota por su ID
 	@Get(':id')
-	findById(@Param('id', ParseIntPipe) id: number): Promise<Partial<Pet>> {
-		return this.petsService.findById(id)
+	findOneById(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.petsService.findOneById(id, user)
 	}
 
 	// Endpoint para crear una nueva mascota
 	@Post()
-	create(@Body() data: CreatePetDto): Promise<Pet> {
-		return this.petsService.createPet(data)
+	create(@Body() createPetDto: CreatePetDto, @ActiveUser() user: UserActiveI) {
+		return this.petsService.createPet(createPetDto, user)
 	}
 
 	// Endpoint para actualizar una mascota
 	@Put(':id')
 	update(
 		@Param('id', ParseIntPipe) id: number,
-		@Body() changes: UpdatePetDto,
-	): Promise<Partial<Pet>> {
-		return this.petsService.updatePet(id, changes)
+		@Body() updatePetDto: UpdatePetDto,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.petsService.updatePet(id, updatePetDto, user)
 	}
 
 	// Endpoint para eliminar una mascota
-	@Patch(':id')
-	delete(@Param('id', ParseIntPipe) id: number) {
-		return this.petsService.softDelete(id)
+	@Delete(':id')
+	delete(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.petsService.softDelete(id, user)
 	}
 }
