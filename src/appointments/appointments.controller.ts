@@ -3,11 +3,11 @@ import {
 	Controller,
 	Get,
 	Post,
-	Patch,
 	Body,
 	Param,
 	Put,
 	ParseIntPipe,
+	Delete,
 } from '@nestjs/common'
 
 //Auth
@@ -19,8 +19,11 @@ import { Role } from 'src/common/enums/role.enum'
 // Services
 import { AppointmentsService } from './appointments.service'
 
-// Entities
-import { Appointment } from './entities/appointment.entity'
+// Decorators
+import { ActiveUser } from 'src/common/decorators/active-user-decorator'
+
+// Interfaces
+import { UserActiveI } from 'src/common/interfaces/user-active-interface'
 
 // DTOs
 import {
@@ -39,34 +42,51 @@ export class AppointmentsController {
 
 	// Endpoint para obtener todas las citas
 	@Get()
-	findAll(): Promise<Partial<Appointment>[]> {
-		return this.appointmentsService.findAll()
+	findAll(@ActiveUser() user: UserActiveI) {
+		return this.appointmentsService.findAll(user)
 	}
 
 	// Endpoint para obtener una cita por ID
 	@Get(':id')
-	findById(@Param('id', ParseIntPipe) id: number): Promise<Appointment> {
-		return this.appointmentsService.findById(id)
+	findById(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.appointmentsService.findOneById(id, user)
 	}
 
 	// Endpoint para crear una nueva cita
 	@Post()
-	create(@Body() data: CreateAppointmentDto): Promise<Appointment> {
-		return this.appointmentsService.createAppointment(data)
+	create(
+		@Body() createAppointmentDto: CreateAppointmentDto,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.appointmentsService.createAppointment(
+			createAppointmentDto,
+			user,
+		)
 	}
 
 	// Endpoint para actualizar una cita existente
 	@Put(':id')
 	update(
 		@Param('id', ParseIntPipe) id: number,
-		@Body() changes: UpdateAppointmentDto,
-	): Promise<Appointment> {
-		return this.appointmentsService.updateAppointment(id, changes)
+		@Body() updateAppointmentDto: UpdateAppointmentDto,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.appointmentsService.updateAppointment(
+			id,
+			updateAppointmentDto,
+			user,
+		)
 	}
 
 	// Endopoint para eliminar una cita
-	@Patch(':id')
-	delete(@Param('id', ParseIntPipe) id: number): Promise<Appointment> {
-		return this.appointmentsService.softDelete(id)
+	@Delete(':id')
+	delete(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return this.appointmentsService.softDelete(id, user)
 	}
 }
