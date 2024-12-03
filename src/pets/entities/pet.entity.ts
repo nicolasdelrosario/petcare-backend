@@ -2,7 +2,9 @@
 import {
 	Column,
 	CreateDateColumn,
+	DeleteDateColumn,
 	Entity,
+	JoinColumn,
 	ManyToOne,
 	OneToMany,
 	PrimaryGeneratedColumn,
@@ -15,6 +17,7 @@ import { Expose } from 'class-transformer'
 // Entities
 import { Appointment } from 'src/appointments/entities/appointment.entity'
 import { Owner } from 'src/owners/entities/owner.entity'
+import { Workspace } from 'src/workspaces/entities/workspace.entity'
 
 @Entity()
 export class Pet {
@@ -54,6 +57,13 @@ export class Pet {
 	@OneToMany(() => Appointment, appointment => appointment.pet)
 	appointments: Appointment[]
 
+	@ManyToOne(() => Workspace)
+	@JoinColumn({ name: 'workspaceId', referencedColumnName: 'id' })
+	workspace: Workspace
+
+	@Column()
+	workspaceId: number
+
 	@CreateDateColumn({
 		type: 'timestamptz',
 		default: () => 'CURRENT_TIMESTAMP',
@@ -67,11 +77,7 @@ export class Pet {
 	})
 	updatedAt: Date
 
-	@Column({
-		type: 'timestamptz',
-		default: () => 'NULL',
-		nullable: true,
-	})
+	@DeleteDateColumn()
 	deletedAt: Date
 
 	@Expose()
