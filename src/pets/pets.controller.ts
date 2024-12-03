@@ -32,7 +32,7 @@ import { CreatePetDto, UpdatePetDto } from './dto/pet.dto'
 import { Role } from 'src/common/enums/role.enum'
 
 // Decorators
-import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator'
 
 @ApiTagsAndBearer('Pets')
 @Auth(Role.USER)

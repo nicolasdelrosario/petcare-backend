@@ -29,7 +29,7 @@ import {
 } from './dto/appointment.dto'
 
 // Decorators
-import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator'
 
 @ApiTagsAndBearer('Appointments')
 @Auth(Role.USER)

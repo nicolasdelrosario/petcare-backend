@@ -25,7 +25,7 @@ import { UpdateUserDto } from './dto/user.dto'
 import { Role } from 'src/common/enums/role.enum'
 
 // Decorators
-import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator'
 
 @ApiTagsAndBearer('Users')
 @Auth(Role.USER)

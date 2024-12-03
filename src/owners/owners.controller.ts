@@ -26,7 +26,7 @@ import { Owner } from './entities/owner.entity'
 import { CreateOwnerDto, UpdateOwnerDto } from './dto/owner.dto'
 
 // Decorators
-import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator.ts'
+import { ApiTagsAndBearer } from '../common/decorators/api-tags-and-bearer.decorator'
 
 @ApiTagsAndBearer('Owners')
 @Auth(Role.USER)
