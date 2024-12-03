@@ -4,10 +4,10 @@ import {
 	Get,
 	Post,
 	Put,
-	Patch,
 	Body,
 	Param,
 	ParseIntPipe,
+	Delete,
 } from '@nestjs/common'
 
 //Auth
@@ -19,8 +19,11 @@ import { Role } from 'src/common/enums/role.enum'
 // Services
 import { OwnersService } from './owners.service'
 
-// Entities
-import { Owner } from './entities/owner.entity'
+// Decorators
+import { ActiveUser } from 'src/common/decorators/active-user-decorator'
+
+// Interfaces
+import { UserActiveI } from 'src/common/interfaces/user-active-interface'
 
 // DTOs
 import { CreateOwnerDto, UpdateOwnerDto } from './dto/owner.dto'
@@ -36,34 +39,44 @@ export class OwnersController {
 
 	// Endpoint para listar los propietarios
 	@Get()
-	async findAll(): Promise<Owner[]> {
-		return await this.ownersService.findAll()
+	async findAll(@ActiveUser() user: UserActiveI) {
+		return await this.ownersService.findAll(user)
 	}
 
 	// Endpoint para listar un propietario por ID
 	@Get(':id')
-	async findById(@Param('id', ParseIntPipe) id: number): Promise<Owner> {
-		return await this.ownersService.findById(id)
+	async findById(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return await this.ownersService.findOneById(id, user)
 	}
 
 	// Endpoint para crear un propietario
 	@Post()
-	async create(@Body() data: CreateOwnerDto): Promise<Owner> {
-		return await this.ownersService.createOwner(data)
+	async create(
+		@Body() createOwnerDto: CreateOwnerDto,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return await this.ownersService.createOwner(createOwnerDto, user)
 	}
 
 	// Endpoint para actualizar un propietario
 	@Put(':id')
 	async update(
 		@Param('id', ParseIntPipe) id: number,
-		@Body() changes: UpdateOwnerDto,
-	): Promise<Owner> {
-		return await this.ownersService.updateOwner(id, changes)
+		@Body() updateOwnerDto: UpdateOwnerDto,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return await this.ownersService.updateOwner(id, updateOwnerDto, user)
 	}
 
 	// Endpoint para eliminar un propietario
-	@Patch(':id')
-	async softDelete(@Param('id', ParseIntPipe) id: number): Promise<Owner> {
-		return await this.ownersService.softDelete(id)
+	@Delete(':id')
+	async softDelete(
+		@Param('id', ParseIntPipe) id: number,
+		@ActiveUser() user: UserActiveI,
+	) {
+		return await this.ownersService.softDelete(id, user)
 	}
 }
