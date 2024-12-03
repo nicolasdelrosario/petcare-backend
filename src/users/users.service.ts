@@ -1,5 +1,9 @@
 // NestJS
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+	Injectable,
+	NotFoundException,
+	BadRequestException,
+} from '@nestjs/common'
 
 // TypeORM
 import { InjectRepository } from '@nestjs/typeorm'
@@ -14,6 +18,9 @@ import { Workspace } from 'src/workspaces/entities/workspace.entity'
 
 // DTOs
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto'
+
+// Interfaces
+import { UserActiveI } from 'src/common/interfaces/user-active-interface'
 
 @Injectable()
 export class UsersService {
@@ -40,16 +47,55 @@ export class UsersService {
 		return user
 	}
 
-	async findAll(): Promise<User[]> {
-		return this.userRepository.find({
-			where: { deletedAt: IsNull() },
+	async findAll(user: UserActiveI) {
+		return await this.userRepository.find({
+			where: { workspace: { id: user.workspaceId } },
 			relations: ['workspace'],
 		})
 	}
 
-	async findById(id: number): Promise<User> {
+	async findOneById(id: number, user: UserActiveI) {
+		return await this.findUserById(id, user.workspaceId)
+	}
+
+	async createUser(createUserDto: CreateUserDto, user?: UserActiveI) {
+		const newUser = this.userRepository.create({
+			...createUserDto,
+			password: await bcrypt.hash(createUserDto.password, 10),
+		})
+
+		const workspaceId = createUserDto.workspaceId || user?.workspaceId
+		if (!workspaceId) {
+			throw new BadRequestException('Workspace ID is required')
+		}
+
+		const workspace = await this.findWorkspaceById(workspaceId)
+		newUser.workspace = workspace
+
+		return this.userRepository.save(newUser)
+	}
+
+	async updateUser(
+		id: number,
+		updateUserDto: UpdateUserDto,
+		user: UserActiveI,
+	) {
+		await this.findUserById(id, user.workspaceId)
+
+		if (updateUserDto.password)
+			updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
+
+		return this.userRepository.update(id, { ...updateUserDto })
+	}
+
+	async remove(id: number, user: UserActiveI) {
+		await this.findUserById(id, user.workspaceId)
+		await this.userRepository.softRemove({ id })
+	}
+
+	private async findUserById(id: number, workspaceId: number) {
 		const user = await this.userRepository.findOne({
-			where: { id, deletedAt: IsNull() },
+			where: { id, workspace: { id: workspaceId }, deletedAt: IsNull() },
 			relations: ['workspace'],
 		})
 
@@ -58,34 +104,14 @@ export class UsersService {
 		return user
 	}
 
-	async createUser(createUserDto: CreateUserDto): Promise<User> {
-		const user = this.userRepository.create(createUserDto)
+	private async findWorkspaceById(workspaceId: number) {
+		const workspace = await this.workspaceRepository.findOne({
+			where: { id: workspaceId },
+		})
 
-		if (createUserDto.workspaceId) {
-			const workspace = await this.workspaceRepository.findOne({
-				where: { id: createUserDto.workspaceId },
-			})
+		if (!workspace)
+			throw new NotFoundException(`Workspace with id #${workspaceId} not found`)
 
-			if (!workspace)
-				throw new NotFoundException(
-					`Workspace with id #${createUserDto.workspaceId} not found`,
-				)
-
-			user.workspace = workspace
-		}
-
-		return this.userRepository.save(user)
-	}
-
-	async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-		if (updateUserDto.password)
-			updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
-
-		await this.userRepository.update({ id }, { ...updateUserDto })
-		return this.findById(id)
-	}
-
-	async remove(id: number) {
-		return await this.userRepository.softRemove({ id })
+		return workspace
 	}
 }
