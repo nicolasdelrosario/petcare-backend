@@ -25,35 +25,60 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 	) {}
 
-	async register({ email, password, ...data }: CreateUserDto) {
-		const user = await this.usersService.findOneByEmail(email)
+	async register(createUserDto: CreateUserDto) {
+		const { email, password, ...data } = createUserDto
 
-		if (user) throw new BadRequestException('User already exists')
+		const existingUser = await this.usersService.findOneByEmail(email)
+		if (existingUser) throw new BadRequestException('User already exists')
 
-		return await this.usersService.createUser({
+		const hashedPassword = await bcryptjs.hash(password, 10)
+		const newUser = await this.usersService.createUser({
 			email,
-			password: await bcryptjs.hash(password, 10),
+			password: hashedPassword,
 			...data,
 		})
-	}
 
-	async login({ email, password }: LoginDto) {
-		const user = await this.usersService.findByEmailWithPassword(email)
-
-		if (!user) throw new UnauthorizedException('Email or password is wrong')
-
-		const isPasswordValid = await bcryptjs.compare(password, user.password)
-
-		if (!isPasswordValid)
-			throw new UnauthorizedException('Email or password is wrong')
-
-		const payload = { email: user.email, role: user.role }
-
-		const token = await this.jwtService.signAsync(payload)
+		const token = await this.generateToken(newUser)
 
 		return {
+			name: newUser.name,
 			token,
-			email,
+			userId: newUser.id,
+			workspaceId: newUser.workspace?.id,
 		}
+	}
+
+	async login(loginDto: LoginDto) {
+		const { email, password } = loginDto
+
+		const user = await this.usersService.findByEmailWithPassword(email)
+		if (!user) {
+			throw new UnauthorizedException('Email or password is wrong')
+		}
+
+		const isPasswordValid = await bcryptjs.compare(password, user.password)
+		if (!isPasswordValid) {
+			throw new UnauthorizedException('Email or password is wrong')
+		}
+
+		const token = await this.generateToken(user)
+
+		return {
+			name: user.name,
+			token,
+			userId: user.id,
+			workspaceId: user.workspace?.id,
+		}
+	}
+
+	private async generateToken(user) {
+		const payload = {
+			email: user.email,
+			role: user.role,
+			userId: user.id,
+			workspaceId: user.workspace?.id,
+		}
+
+		return this.jwtService.signAsync(payload)
 	}
 }
