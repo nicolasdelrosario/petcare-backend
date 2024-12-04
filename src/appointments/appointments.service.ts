@@ -48,7 +48,10 @@ export class AppointmentsService {
 		createAppointmentDto: CreateAppointmentDto,
 		user: UserActiveI,
 	) {
-		const appointment = this.appointmentRepository.create(createAppointmentDto)
+		const appointment = this.appointmentRepository.create({
+			...createAppointmentDto,
+			workspaceId: user.workspaceId,
+		})
 
 		if (createAppointmentDto.userId)
 			appointment.user = await this.findUserById(
